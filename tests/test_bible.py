@@ -91,6 +91,15 @@ class TestPassage(unittest.TestCase):
         self.assertEqual(str(passage.start), 'Acts 8:37')
         self.assertEqual(str(passage.end), 'Romans 16:27')
 
+    def test_parse_string(self):
+        self.assertEqual(bible.parse_string('Rom 1:1-16:27')[0], self.romans)
+        self.assertEqual(bible.parse_string('Romans 2:1-4')[0],
+                         self.romans_smaller)
+        self.assertEqual(bible.parse_string('Acts 1:1 - Romans 16:27')[0],
+                         self.two_books)
+        self.assertEqual(bible.parse_string('1 Peter 1:1')[0],
+                         bible.Passage('1Pet.1:1', '1Pet.1:1'))
+
 
 class TestVerse(unittest.TestCase):
     def setUp(self):
@@ -113,6 +122,7 @@ class TestVerse(unittest.TestCase):
         self.assertEqual(repr(self.eph2_10), self.eph2_10.to_string())
         self.assertEqual(repr(self.acts_8_37_kjv), '44-8-37-kvj')
         self.assertEqual(repr(self.acts_8_37_esv), '44-8-37-esv')
+
 
 class TestAbbreviations(unittest.TestCase):
     def test_book_abbrevs(self):

@@ -13,6 +13,17 @@ BOOK_RE = re.compile(r'^\d*[a-zA-Z ]*')
 REF_RE = re.compile(r'\d{1,3}:\d{1,3}')
 TRANSLATION_RE = re.compile(r'[a-zA-Z]{2,}$')
 
+# regular expressions for reading almost any verse format you can think of
+PASSAGE_RE = re.compile(r'\b(?P<book>(?:([1-3]|I{1,3})\s*)?[a-zA-Z]+)?'
+                        r'\.?\s*(?P<line>(?P<start_chapter>\d+)'
+                        r'(?::(?P<start_verse>\d+)?)?'
+                        r'(?:[^\-\u2014\x96\da-zA-Z]*'
+                        r'[\-\u2014\x96][^\da-zA-Z]*'
+                        r'(?:(?:(?P<book2>(?:([1-3]|I{1,3})\s*)?[a-zA-Z]+)'
+                        r'\.?\s*)?(?:(?P<end_chapter>\d+))?'
+                        r'(?::(?P<end_verse>\d+))?)?)?)?',
+                        re.U and re.I)
+
 
 class RangeError(Exception):
     """Exception class for books, verses, and chapters out of range."""
@@ -105,8 +116,8 @@ class Verse:
                 try:
                     self.book = found
                 except:
-                    raise RangeError("Can't find that book of the Bible: "
-                                     + book_ref)
+                    raise RangeError("Can't find that book of the Bible: " +
+                                     book_ref)
 
                 # extract chapter and verse from ref
                 self.chapter, self.verse = map(int, ref.split(':'))
@@ -151,8 +162,9 @@ class Verse:
     def __eq__(self, other):
         if self.translation is None and other.translation is None:
             # if both transl are None, they won't equate when they should
-            return (self.book == other.book and self.chapter == other.chapter  \
-                    and self.verse == other.verse)
+            return (self.book == other.book and
+                    self.chapter == other.chapter and
+                    self.verse == other.verse)
         else:  # at least 1 translation is set, so == works
             return self == other
 
@@ -570,6 +582,16 @@ class Passage:
         # return the formatted value
         return formatted_str
 
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return False
+
+        # start (verse), and end, must be equal.
+        if (self.start, self.end) == (other.start, other.end):
+            return True
+
+        return False
+
 
 def _format_char(verse, char):
     """Return a string for the part of a verse.
@@ -610,3 +632,85 @@ def book_abbreviations():
     for book in bible_data:
         lines.append(book['name']+':'+','.join(book['abbrs']))
     return '\n'.join(lines)
+
+
+def parse_string(*args):
+    verses = []
+
+    for passage in args:
+        matches = PASSAGE_RE.finditer(passage)
+
+        prevbook = 'genesis'
+
+        for match in matches:
+            if match.group().strip() == '':
+                continue
+
+            start_book = match.group('book')
+            if match.group('line') is not None:
+                start_chapter = match.group('start_chapter')
+                start_verse = match.group('start_verse')
+                end_book = match.group('book2')
+                end_chapter = match.group('end_chapter')
+                end_verse = match.group('end_verse')
+            else:
+                start_chapter = '1'
+                start_verse = None
+                end_chapter = '999'
+                end_verse = None
+                end_book = None
+
+            if start_book is None:
+                start_book = prevbook
+            prevbook = start_book
+
+            verse_text = start_book
+            if start_chapter is not None:
+                verse_text += start_chapter
+
+            if start_verse is not None:
+                verse_text += ':' + start_verse
+            else:
+                verse_text += ':1'
+                # if only a chapter is given select the whole chapter as a
+                # range
+                if end_chapter is None:
+                    end_chapter = start_chapter
+
+            try:
+                verse1 = Verse(verse_text)
+            except Exception as e:
+                verse1 = None
+                verses.append((e, match.group()))
+
+            verse2 = None
+
+            if end_book is not None:
+                end_book = re.sub(r'\s+', '', end_book).lower()
+                verse_text = end_book
+            else:
+                verse_text = start_book
+
+            if end_chapter is not None:
+                if end_verse is None:
+                    if start_verse is None:
+                        verse_text += end_chapter + ':999'
+                    else:
+                        # if and end chapter if not given then the end_chapter
+                        # is assumed to be a verse of the start chapter
+                        verse_text += start_chapter + ':' + end_chapter
+                else:
+                    verse_text += end_chapter + ':' + end_verse
+
+                try:
+                    verse2 = Verse(verse_text)
+                except Exception as e:
+                    verse2 = None
+                    verses.append((e, match.group()))
+
+            if verse1 is not None:
+                if verse2 is not None:
+                    verses.append(Passage(verse1, verse2))
+                else:
+                    verses.append(Passage(verse1, verse1))
+    return verses

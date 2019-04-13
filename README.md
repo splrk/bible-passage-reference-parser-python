@@ -12,7 +12,7 @@ display the actual verse text for a reference.
 Installation
 ------------
 
-pip install bible3
+pip install bible-passage-reference-parser
 
 
 ## Using Classes
@@ -33,14 +33,10 @@ for numerous examples of use. Here are some basics:
 Fork and Thanks
 ---------------
 
-I forked this to make it Python 3 compatible. I've added some tests, certainly
- more could be included. All tests pass in Python 2.7.13 and Python 3.6.2.
+I forked this to add a `parse_string` methods
 
 \__str__ and \__repr__ added to both Verse and Passage classes, \__len__ added to
  Passage, other changes were minimal.
 
-Thanks to Jason Ford for writing this and making it available to the world.
-
-SDG,
-
-Tom Faulkner
+Thanks to Jason Ford and Tom Faulkner for writing this and making it available
+to the world.
