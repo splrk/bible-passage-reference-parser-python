@@ -1,13 +1,13 @@
-from distutils.core import setup
+import setuptools
 
-setup(
-    name="bible3",
+setuptools.setup(
+    name="bible-passage-reference-parser",
     packages=["bible"],
     version="1.0.0",
     description="Bible reference classes",
-    author="Tom Faulkner",
-    author_email="tomfaulkner@gmail.com.com",
-    url="http://github.com/tomfaulkner/bible",
+    author="Ryan Seal",
+    author_email="rseal@twr.org",
+    url="http://gitlab.com/rseal/bible-passage-reference-parser-python",
     keywords=["encoding", "i18n", "xml", "bible", "django"],
     classifiers=[
         "Programming Language :: Python",
