@@ -99,6 +99,8 @@ class TestPassage(unittest.TestCase):
                          self.two_books)
         self.assertEqual(bible.parse_string('1 Peter 1:1')[0],
                          bible.Passage('1Pet.1:1', '1Pet.1:1'))
+        self.assertEqual(bible.parse_string('Matthew 18')[0],
+                         bible.Passage('Matt.18:1', 'Matt.18:35'))
 
 
 class TestVerse(unittest.TestCase):

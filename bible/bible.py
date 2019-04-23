@@ -640,6 +640,26 @@ def book_abbreviations():
     return '\n'.join(lines)
 
 
+def find_book(book, translation=None):
+    try:
+        book_ref = BOOK_RE.search(book).group(0)
+    except:
+        raise RangeError("We can't find that book of the Bible: %s" % book)
+
+    # try to find the book listed as a book name or abbreviation
+    bibledata = bible.data.bible_data(translation)
+    book_ref = book_ref.rstrip('.').lower().strip()
+    for i, book in enumerate(bibledata):
+        if book['name'].lower() == book_ref:
+            return (i+1, book)
+        else:
+            for abbr in book['abbrs']:
+                if abbr == book_ref:
+                    return (i + 1, book)
+
+    raise RangeError("Can't find that book of the Bible: " + book)
+
+
 def parse_string(*args):
     verses = []
 
@@ -700,7 +720,10 @@ def parse_string(*args):
             if end_chapter is not None:
                 if end_verse is None:
                     if start_verse is None:
-                        verse_text += end_chapter + ':999'
+                        _, book = find_book(end_book or start_book)
+                        endc = int(end_chapter)
+                        max_verses = book['verse_counts'][endc - 1]
+                        verse_text += '%s:%d' % (end_chapter, max_verses)
                     else:
                         # if and end chapter if not given then the end_chapter
                         # is assumed to be a verse of the start chapter
