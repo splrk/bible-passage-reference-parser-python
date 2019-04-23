@@ -569,6 +569,8 @@ class Passage:
 
             # start and end are in the same chapter of the same book
             if self.start.chapter == self.end.chapter:
+                if self.start.verse == self.end.verse:
+                    formatted_str = self.format('B C:V')
                 formatted_str = self.format('B C:V-v')
 
             # start and end are in different chapters of the same book
