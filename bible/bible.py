@@ -718,20 +718,21 @@ def parse_string(*args):
                 verse_text = start_book
 
             if end_chapter is not None:
-                if end_verse is None:
-                    if start_verse is None:
-                        _, book = find_book(end_book or start_book)
-                        endc = int(end_chapter)
-                        max_verses = book['verse_counts'][endc - 1]
-                        verse_text += '%s:%d' % (end_chapter, max_verses)
-                    else:
-                        # if and end chapter if not given then the end_chapter
-                        # is assumed to be a verse of the start chapter
-                        verse_text += start_chapter + ':' + end_chapter
-                else:
-                    verse_text += end_chapter + ':' + end_verse
-
                 try:
+                    if end_verse is None:
+                        if start_verse is None:
+                            _, book = find_book(end_book or start_book)
+                            endc = int(end_chapter)
+                            max_verses = book['verse_counts'][endc - 1]
+                            verse_text += '%s:%d' % (end_chapter, max_verses)
+                        else:
+                            # if and end chapter if not given then the end
+                            # chapter # is assumed to be a verse of the start
+                            # chapter
+                            verse_text += start_chapter + ':' + end_chapter
+                    else:
+                        verse_text += end_chapter + ':' + end_verse
+
                     verse2 = Verse(verse_text)
                 except Exception as e:
                     verse2 = None

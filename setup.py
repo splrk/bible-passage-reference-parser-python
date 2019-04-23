@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name="bible-passage-reference-parser",
     packages=["bible"],
-    version="1.0.3",
+    version="1.0.4",
     description="Bible reference classes",
     author="Ryan Seal",
     author_email="rseal@twr.org",
