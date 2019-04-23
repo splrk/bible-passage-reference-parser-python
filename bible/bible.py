@@ -563,6 +563,10 @@ class Passage:
              Start:  Acts 1:1
              End:    Rom. 1:1
              Output: Acts 1:1 - Romans 1:1
+             ------
+             Start:  Acts 1:1
+             End:    Acts 1:1
+             Output: Acts 1:1
         """
         # start and end are in the same book
         if self.start.book == self.end.book:
