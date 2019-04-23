@@ -640,11 +640,11 @@ def book_abbreviations():
     return '\n'.join(lines)
 
 
-def find_book(book, translation=None):
+def find_book(book_str, translation=None):
     try:
-        book_ref = BOOK_RE.search(book).group(0)
+        book_ref = BOOK_RE.search(book_str).group(0)
     except:
-        raise RangeError("We can't find that book of the Bible: %s" % book)
+        raise RangeError("We can't find that book of the Bible: %s" % book_str)
 
     # try to find the book listed as a book name or abbreviation
     bibledata = bible.data.bible_data(translation)
@@ -657,7 +657,7 @@ def find_book(book, translation=None):
                 if abbr == book_ref:
                     return (i + 1, book)
 
-    raise RangeError("Can't find that book of the Bible: " + book)
+    raise RangeError("Can't find that book of the Bible: %s" % book_str)
 
 
 def parse_string(*args):
